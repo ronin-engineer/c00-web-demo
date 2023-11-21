@@ -10,5 +10,14 @@ public class Hotel {
 
     private String hotelName;
 
+    private Integer rate;   // 1 - 5 star(s)
+
     private boolean status = true;
 }
+
+
+// Service Layer
+
+// Repository (DB) Layer
+//
+// DB

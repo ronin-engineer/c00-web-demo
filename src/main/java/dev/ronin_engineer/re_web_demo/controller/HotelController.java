@@ -2,11 +2,13 @@ package dev.ronin_engineer.re_web_demo.controller;
 
 
 import dev.ronin_engineer.re_web_demo.dto.CreateHotelRequest;
+import dev.ronin_engineer.re_web_demo.dto.ResponseDto;
 import dev.ronin_engineer.re_web_demo.dto.UpdateHotelRequest;
 import dev.ronin_engineer.re_web_demo.entity.Hotel;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @RestController
@@ -18,12 +20,13 @@ public class HotelController {
     // 1. Tạo hotel
     // Method: POST
     // Path: /api/v1/hotels
-    @PostMapping("/")
+    @PostMapping
     public Hotel createHotel(@RequestBody CreateHotelRequest request) {
         Hotel hotel = new Hotel();
 
         hotel.setHotelId(request.getHotelId());
         hotel.setHotelName(request.getHotelName());
+        hotel.setRate(request.getRate());
 
         hotels.add(hotel);
 
@@ -34,9 +37,55 @@ public class HotelController {
     // 2. Lấy danh sách hotel
     // Method: GET
     // Path: /api/v1/hotels
-    @GetMapping("/")
-    public List<Hotel> getHotels() {
+    @GetMapping
+    public List<Hotel> getHotels(@RequestParam(required = false) Integer rate,
+                                 @RequestParam(required = false) Boolean status) {  // nullable
+        if (rate != null && status == null) {
+            return findHotelsByRate(rate);
+        } else if (rate == null && status != null) {
+            return findHotelsByStatus(status);
+        }
+        else if (rate != null && status != null) {
+            return findHotelsByStatusAndRate(status, rate);
+        }
+
         return hotels;
+    }
+
+    List<Hotel> findHotelsByRate(Integer rate) {
+        List<Hotel> result = new LinkedList<>();
+
+        for (Hotel hotel: hotels) {
+            if (hotel.getRate() == rate) {
+                result.add(hotel);
+            }
+        }
+
+        return result;
+    }
+
+    List<Hotel> findHotelsByStatus(Boolean status) {
+        List<Hotel> result = new LinkedList<>();
+
+        for (Hotel hotel: hotels) {
+            if (hotel.isStatus() == status) {
+                result.add(hotel);
+            }
+        }
+
+        return result;
+    }
+
+    List<Hotel> findHotelsByStatusAndRate(Boolean status, Integer rate) {
+        List<Hotel> result = new LinkedList<>();
+
+        for (Hotel hotel: hotels) {
+            if (hotel.isStatus() == status && hotel.getRate() == rate) {
+                result.add(hotel);
+            }
+        }
+
+        return result;
     }
 
 
@@ -70,7 +119,16 @@ public class HotelController {
     // Method: DELETE
     // Path: /api/v1/hotels/<hotel_id>
     // @DeleteMapping
-    // TODO
+    @DeleteMapping("/{hotelId}")
+    public ResponseDto disableHotel(@PathVariable String hotelId) {
+        Hotel hotel = findHotelById(hotelId);
+        if (hotel == null) {
+            return new ResponseDto(false, "Hotel Not Found");
+        }
+
+        hotel.setStatus(false);
+        return new ResponseDto(true, "Successful");
+    }
 
 
     private Hotel findHotelById(String hotelId) {
