@@ -1,23 +1,31 @@
 package dev.ronin_engineer.re_web_demo.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
 
-@Data
+@Entity
+@Table(name = "hotel")
+@Data   // No-arg constructor
 public class Hotel {
 
-    private String hotelId;
+    // 1. @Id - primary
+    // 2. No-arg constructor
+//    public Hotel() {
+//    }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long hotelId;
+
+    @Column(name = "name")
     private String hotelName;
 
-    private Integer rate;   // 1 - 5 star(s)
+    @Column(name = "status")
+    private boolean status;
 
-    private boolean status = true;
+    @Transient  // dont persist
+    private int rate;
 }
 
-
-// Service Layer
-
-// Repository (DB) Layer
-//
-// DB
