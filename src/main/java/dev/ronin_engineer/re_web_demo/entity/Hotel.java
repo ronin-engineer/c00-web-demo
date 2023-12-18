@@ -27,5 +27,9 @@ public class Hotel {
 
     @Transient  // dont persist
     private int rate;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private Address address;
 }
 
